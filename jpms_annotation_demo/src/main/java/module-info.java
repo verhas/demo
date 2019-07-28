@@ -1,3 +1,3 @@
-module javax0.jpms.annotation.demo {
+module javax0.jpms.annotation.demo.use {
     exports javax0.demo.jpms.annotation;
 }
