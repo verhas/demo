@@ -1,5 +1,9 @@
 # Annotation Handling and JPMS
 
+
+>TLDR; Instread of `annotation.getClass().getMethod("value")` call
+`annotation.annotationType().getMethod("value")`.
+
 All Java developers have heard about annotations. Annotations are with
 us since Java 1.5 (or only 1.6 if you insist). Based on my experience
 interviewing candidates I feel that most of the Java developers know how
@@ -140,10 +144,139 @@ public class DemoClassAbbreviated {
 }
 ``` 
 
-# How to read the annotation using reflection
+## How to read the annotation using reflection
 
 Now that we know that the annotation is just an interface the next
 question is how can we get information about them. The methods that
 deliver the information about the annotations are in the reflection part
-of the JDK. If we have an element that can have an annotation (e.g. a `Class`, `Method` or `Field` object) then we can call
-`getDeclaredAnnotations()` to get all the annotations that the element has or 
+of the JDK. If we have an element that can have an annotation (e.g. a
+`Class`, `Method` or `Field` object) then we can call
+`getDeclaredAnnotations()` to get all the annotations that the element
+has or `getDeclaredAnnotation()` in case we know what annotation we
+need.
+
+The return value is an annotation object (or an array of it in the first
+case). Obviously it is an object because everything is an object is Java
+(or a primitive, but annotations are anything but primitive). This
+object is the instance of a class that implements the annotation
+interface. If we want to know what string the programmer wrote between
+the parenthesis we should write soemthing like
+
+<!--snip GetValue_01 trim="do"-->
+```java
+final var klass = DemoClass.class;
+final var annotation = klass.getDeclaredAnnotation(Demo.class);
+final var valueMethod = annotation.getClass().getMethod("value");
+final var value = valueMethod.invoke(annotation);
+Assertions.assertEquals("This is a demo class", value);
+```
+
+Because value is a method in the interface, certainly implemented by the
+class that we have access to through one of its instances we can call it
+reflectively and get back the result, which is `"This is a demo class"`
+in this case.
+
+## What is the problem with this approach
+
+Generally nothing so long as long we are not in the realm of JPMS. We
+get access to the method of the class and invoke it. We could get access
+to the method of the interface and invoke it on the object but in
+practice it is the same. (Or not in case of JPMS.)
+
+I was using this approach in Java::Geci. The framework uses the `@Geci`
+annotation to identify which class needs generated code inserted into.
+It has a fairly complex algorithm to find the annotations because it
+accepts any annotation that has the name `Geci` no matter which package
+it is in and it also accepts any annotation that in its `@interface`
+declaration has an annotation that can also be used as a  `Geci`
+annotation (it is named `Geci` or the annotation has an annotation that
+is `Geci` recursively).
+
+This complex annotation handling has its reason. The framework is complex so the use can be simple.
+You can either say:
+
+```java
+@Geci("fluent definedBy='javax0.geci.buildfluent.TestBuildFluentForSourceBuilder::sourceBuilderGrammar'")
+```
+
+or you can have your own annotations and then say
+
+```java
+@Fluent(definedBy="javax0.geci.buildfluent.TestBuildFluentForSourceBuilder::sourceBuilderGrammar")
+```
+
+The code was working fine up to Java 11. When the code was executed
+using Java 11 I go the error from one of the tests:
+
+```
+java.lang.reflect.InaccessibleObjectException: 
+Unable to make public final java.lang.String com.sun.proxy.jdk.proxy1.$Proxy12.value() 
+accessible: module jdk.proxy1 does not 
+"exports com.sun.proxy.jdk.proxy1" to module geci.tools
+```
+
+(Some line breaks were inserted for readability.)
+
+The protection of JPMS kicks in and it does not allow us to access
+something in the JDK we are not supposed to. The question is what do we
+really do and why do we do it?
+
+When doing tests in JPMS we have to add a lot of `--add-opens` command
+line argument to the tests because the tests want to access the art of
+the code using reflection that is not accessible for the library user.
+But this error code is not about a module that is defined inside
+Java::Geci.
+
+JPMS protects the libraries from bad use. You can specify which
+prackages contain the classes that are usable from the outside. Other
+packages even if they contain public interfaces and classes are only
+available inside the module. This helps module development. Users cannot
+use the internal classes so you are free to redesign them so long as
+long the API remains. The file `module-info.java` declares these
+packages as
+
+<!--snip moduleinfo-->
+```java
+module javax0.jpms.annotation.demo.use {
+    exports javax0.demo.jpms.annotation;
+}
+```
+
+When a package is exported the classes and interfaces in the package can
+be accessed directly or via reflection. There is another way to give
+access to classes and interfaces in a package. This is opening the
+package. The keyword for this is `opens`. If the `module-info.java` only
+`opens` the package then this is accessible only via reflection.
+
+The above error message says that the module module `jdk.proxy1` does
+not include in its `module-info.java` a line that `exports
+com.sun.proxy.jdk.proxy1` the package. You can try and add an
+`add-exports jdk.proxy1/com.sun.proxy.jdk.proxy1=ALL_UNNAMED` but it
+does not work. I do not know why it does not work, but it does not. And
+as a matter of fact it is good that it is not working because the
+package `com.sun.proxy.jdk.proxy1` is something that is the internal
+part of the JDK, something like `unsafe` was that caused so much
+hedeache to Java in the past.
+
+Instead trying to illegally open the treasure box let's focus on why we
+wanted to open it in the first place and if we really need to access to
+that?
+
+Long story short (I mean a few hours of debugging, investigating and
+understanding instead of mindless stackoverflow copy/paste that nobody
+does): we must not touch the `value()` method of the class that
+implements the annotation interface. We have to use the following code:
+
+<!--snip GetValue_02 trim="do"-->
+```java
+final var klass = DemoClass.class;
+final var annotation = klass.getDeclaredAnnotation(Demo.class);
+final var valueMethod = annotation.annotationType().getMethod("value");
+final var value = valueMethod.invoke(annotation);
+Assertions.assertEquals("This is a demo class", value);
+```
+
+(This is already fixed in Java::Geci 1.2.0) We have the annotation
+object but instead of asking for the class of it we have to get access
+to the `annotationType()`, which is the interface itself that we coded.
+That is something the module exports and thus we can invoke it.
