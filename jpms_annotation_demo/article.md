@@ -1,4 +1,4 @@
->TLDR; Instread of `annotation.getClass().getMethod("value")` call
+&gt;TLDR; Instead of `annotation.getClass().getMethod("value")` call
 `annotation.annotationType().getMethod("value")`.
 
 All Java developers have heard about annotations. Annotations are with
@@ -17,7 +17,7 @@ annotation processors and some of them can be processed during run time.
 I could continue it but the long story short is that annotations are a
 mistery for most of the Java developers. If you feel offended (that is
 your problem by the way) or think that I am wrong stating how clueless
-related to the annotations most of the Java developers then consider
+related to the annotations most of the Java developers are, then consider
 that the number of programmers, coders, generally, was growing
 exponentially during the last 30 years and Java developers, specially,
 was doing so during the last 20 years and it is still growing
@@ -26,7 +26,7 @@ of whatnot is growing exponentially then most of the whatnots are young.
 That is the reason why most Java developers do not know well annotations
 and not because Java developers are .. I do not know.
 
-To be honest, annotation handlign is not something simple. It deserves
+To be honest, annotation handling is not something simple. It deserves
 an article especially when we want to handle annotations while using
 module systems.
 
@@ -178,11 +178,11 @@ in this case.
 Generally nothing so long as long we are not in the realm of JPMS. We
 get access to the method of the class and invoke it. We could get access
 to the method of the interface and invoke it on the object but in
-practice it is the same. (Or not in case of JPMS.)
+practice, it is the same. (Or not in case of JPMS.)
 
 I was using this approach in Java::Geci. The framework uses the `@Geci`
 annotation to identify which class needs generated code inserted into.
-It has a fairly complex algorithm to find the annotations because it
+It has a fairly complex algorithm to find the annotations because of it
 accepts any annotation that has the name `Geci` no matter which package
 it is in and it also accepts any annotation that in its `@interface`
 declaration has an annotation that can also be used as a  `Geci`
@@ -250,12 +250,12 @@ not include in its `module-info.java` a line that `exports
 com.sun.proxy.jdk.proxy1` the package. You can try and add an
 `add-exports jdk.proxy1/com.sun.proxy.jdk.proxy1=ALL_UNNAMED` but it
 does not work. I do not know why it does not work, but it does not. And
-as a matter of fact it is good that it is not working because the
+as a matter of fact, it is good that it is not working because the
 package `com.sun.proxy.jdk.proxy1` is something that is the internal
 part of the JDK, something like `unsafe` was that caused so much
-hedeache to Java in the past.
+headache to Java in the past.
 
-Instead trying to illegally open the treasure box let's focus on why we
+Instead of trying to illegally open the treasure box let's focus on why we
 wanted to open it in the first place and if we really need to access to
 that?
 
