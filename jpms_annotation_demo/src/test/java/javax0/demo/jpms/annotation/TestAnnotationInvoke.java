@@ -11,7 +11,8 @@ public class TestAnnotationInvoke {
     @Test
     void testReflectiveCall() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         final var klass = DemoClass.class;
-        final var annotation = klass.getDeclaredAnnotations()[0];
+        final var annotations = klass.getDeclaredAnnotations();
+        final var annotation = klass.getDeclaredAnnotation(Demo.class);
         Assertions.assertEquals("This is a demo class", AnnotationValueGetter.getValue(annotation));
     }
 }

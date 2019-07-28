@@ -140,3 +140,10 @@ public class DemoClassAbbreviated {
 }
 ``` 
 
+# How to read the annotation using reflection
+
+Now that we know that the annotation is just an interface the next
+question is how can we get information about them. The methods that
+deliver the information about the annotations are in the reflection part
+of the JDK. If we have an element that can have an annotation (e.g. a `Class`, `Method` or `Field` object) then we can call
+`getDeclaredAnnotations()` to get all the annotations that the element has or 
