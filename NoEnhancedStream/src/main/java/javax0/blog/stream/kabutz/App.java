@@ -38,8 +38,10 @@ public class App {
 
         @Override
         public boolean equals(Object obj) {
-            others.put(((Envelope) obj).town, null);
-            return town.toUpperCase().equals(((Envelope) obj).town.toUpperCase());
+            final var b = town.toUpperCase().equals(((Envelope) obj).town.toUpperCase());
+            if (b)
+                others.put(((Envelope) obj).town, null);
+            return b;
         }
     }
 }
