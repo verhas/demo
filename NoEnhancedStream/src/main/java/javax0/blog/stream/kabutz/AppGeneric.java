@@ -67,8 +67,10 @@ public class AppGeneric {
         @Override
         public boolean equals(Object obj) {
             final var b = enveloper.equalFunction.apply(t, ((Envelope<T>) obj).t);
-            if (b)
+            if (b) {
                 others.put(((Envelope<T>) obj).t, null);
+                ((Envelope<T>)obj).others.put(t,null);
+            }
             return b;
         }
     }

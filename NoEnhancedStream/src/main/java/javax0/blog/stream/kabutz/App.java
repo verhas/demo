@@ -39,8 +39,10 @@ public class App {
         @Override
         public boolean equals(Object obj) {
             final var b = town.toUpperCase().equals(((Envelope) obj).town.toUpperCase());
-            if (b)
+            if (b) {
                 others.put(((Envelope) obj).town, null);
+                ((Envelope) obj).others.put(town,null);
+            }
             return b;
         }
     }
