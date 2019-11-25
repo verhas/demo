@@ -4,6 +4,7 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.ToIntFunction;
 import java.util.stream.Stream;
 
 public class AppGeneric {
@@ -25,11 +26,11 @@ public class AppGeneric {
 
     private static class Enveloper<T> {
         private final BiFunction<T, T, T> merger;
-        Function<T, Integer> hashFunction;
+        ToIntFunction<T> hashFunction;
         private final BiFunction<T, T, Boolean> equalFunction;
 
         private Enveloper(BiFunction<T, T, T> merger,
-                          Function<T, Integer> hashFunction,
+                          ToIntFunction<T> hashFunction,
                           BiFunction<T, T, Boolean> equalFunction) {
             this.merger = merger;
             this.hashFunction = hashFunction;
@@ -61,7 +62,7 @@ public class AppGeneric {
 
         @Override
         public int hashCode() {
-            return enveloper.hashFunction.apply(t);
+            return enveloper.hashFunction.applyAsInt(t);
         }
 
         @Override
