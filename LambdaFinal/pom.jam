@@ -1,0 +1,32 @@
+{@import https://raw.githubusercontent.com/central7/pom/main/pom.jim}
+{@define default($_,$content)=<$_>$content</$_>}
+{project lambda-final}
+  {GAV :javax0.blog:lambda-final:1.0.0-SNAPSHOT}
+  {description sample cod demonstrating why a lambda expression can access only final and effectively final local variables}
+
+  {dependencies
+          {@for MODULE in (api,engine,snippet)={dependency :com.javax0.jamal:jamal-MODULE:1.10.0-SNAPSHOT:test}}
+          {@for MODULE in (api,engine,params)={dependency :org.junit.jupiter:junit-jupiter-MODULE:5.8.1:test}}
+          {dependency :org.assertj:assertj-core:3.11.1:test}
+          <dependency>
+              <groupId>org.codehaus.groovy</groupId>
+              <artifactId>groovy-all</artifactId>
+              <version>3.0.9</version>
+              <type>pom</type>
+          </dependency>
+  }
+  {build
+    {plugins
+      {plugin
+         {GAV :org.apache.maven.plugins:maven-compiler-plugin:3.8.1}
+         {configuration
+           {source 17}
+           {target 17}
+         }
+      }
+      {plugin
+        {GAV :org.apache.maven.plugins:maven-surefire-plugin:3.0.0-M4}
+      }
+    }
+  }
+{end project}
