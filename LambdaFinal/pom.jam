@@ -8,12 +8,6 @@
           {@for MODULE in (api,engine,snippet)={dependency :com.javax0.jamal:jamal-MODULE:1.10.0-SNAPSHOT:test}}
           {@for MODULE in (api,engine,params)={dependency :org.junit.jupiter:junit-jupiter-MODULE:5.8.1:test}}
           {dependency :org.assertj:assertj-core:3.11.1:test}
-          <dependency>
-              <groupId>org.codehaus.groovy</groupId>
-              <artifactId>groovy-all</artifactId>
-              <version>3.0.9</version>
-              <type>pom</type>
-          </dependency>
   }
   {build
     {plugins
