@@ -181,7 +181,15 @@ When you need a state that a lambda uses, in other words, when you need a closur
 
 # Summary
 
-This article discussed why a lambda expression can access only final and effectively final local variables.
-We also discussed the reason and how different languages approach this issue.
-Finally, we looked at a Groovy example and how Java can mimic this.
+* This article discussed why a lambda expression can access only final and effectively final local variables.
+
+* We also discussed the reason and how different languages approach this issue.
+
+* Finally, we looked at a Groovy example and how Java can mimic this.
+
+Therefore, if anyone asks you the interview question, why a lambda expression can access only final and effectively final local variables, you will know the answer.
+Because the Java Language Specification says so.
+Everything else is speculation.
+
+You an find the code for this article along with the article text source code at https://github.com/verhas/demo/tree/master/LambdaFinal
 %}
